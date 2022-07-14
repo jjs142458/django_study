@@ -86,9 +86,9 @@ def delete(req):
     global topics
     if req.method == 'POST':
         id = req.POST["id"]
-        newtopic = []
+        newtopics = []
         for topic in topics:
             if topic["id"] != int(id):
-                newtopic.append(topic)
-        topics = newtopic
-        redirect('/')
+                newtopics.append(topic)
+        topics = newtopics
+        return redirect('/')
