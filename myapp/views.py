@@ -1,4 +1,5 @@
 from difflib import HtmlDiff
+from select import select
 from turtle import title
 from urllib import request
 from django.http import HttpResponse
@@ -36,6 +37,7 @@ def HTMLtem(articleTag, id=None):
                     <input type="submit" value="delete">
                 </form>
             </li>
+            <li><a href="/update/{id}">update</a></li>
         </ul>
     </body>
     </html>'''
@@ -92,3 +94,33 @@ def delete(req):
                 newtopics.append(topic)
         topics = newtopics
         return redirect('/')
+
+
+@csrf_exempt
+def update(req, id):
+    global topics
+    if req.method == 'GET':
+        for topic in topics:
+            if topic["id"] == int(id):
+                selectedTopic = {
+                    "title": topic["title"],
+                    "body": topic["body"]
+                }
+        article = f'''
+        <form action="/update/{id}/" method="post">
+            <p><input type="text" name="title" placeholder="title" value={selectedTopic["title"]}></p>
+            <p><textarea name="body" placeholder="body">{selectedTopic["body"]}</textarea></p>
+            <p><input type="submit"></p>
+        </form>
+        '''
+        return HttpResponse(HTMLtem(article, id))
+    elif req.method == 'POST':
+        title = req.POST["title"]
+        body = req.POST["body"]
+
+        for topic in topics:
+            if topic["id"] == int(id):
+                topic["title"] = title
+                topic["body"] = body
+
+        return redirect(f'/read/{id}')
